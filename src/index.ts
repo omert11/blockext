@@ -1,9 +1,7 @@
-import { factoryFunction, tagFactory } from "./factory";
+import { TagType } from "./enums";
+import { factoryFunction } from "./factory";
 import { eachFunction, IBlockeXt, loopFunction, Tag } from "./interfaces";
-import registry from "./registry";
-function default_each_method(el: HTMLElement, context: any, loop_method: loopFunction, RC: IBlockeXt) {
-    el.childNodes.forEach((item, i) => loop_method.call(RC, i, item, context));
-}
+import { registry } from "./registry";
 class BlockeXt implements IBlockeXt {
     el: HTMLElement;
     main_elements: NodeListOf<HTMLElement>;
@@ -11,7 +9,7 @@ class BlockeXt implements IBlockeXt {
     tag_instances: Tag[];
     used_tags: string[];
     tags: factoryFunction[];
-    constructor(selectorOrElement: keyof HTMLElementTagNameMap | HTMLElement) {
+    constructor(selectorOrElement: keyof HTMLElementTagNameMap | HTMLElement | string) {
         let el = null;
         if (typeof selectorOrElement == "string") {
             el = document.querySelector(selectorOrElement);
@@ -32,7 +30,7 @@ class BlockeXt implements IBlockeXt {
         this.tags = registry.get_tag_methods(this.used_tags);
     }
     get_filtered_TAGS(type: TagType): factoryFunction[] {
-        if (!this[`__${type}_tag_cache`]) this[`__${type}_tag_cache`] = this.tags.filter((i) => i.type == type);
+        if (!this[`__${type}_tag_cache`]) this[`__${type}_tag_cache`] = this.tags.filter((i) => i._type == type);
         return this[`__${type}_tag_cache`];
     }
     *get_TAG_iter(el: HTMLElement, context: any, tags: factoryFunction[]) {
@@ -51,6 +49,9 @@ class BlockeXt implements IBlockeXt {
         return this.get_TAG_iter(el, context, this.each_tags);
     }
     main_loop(data: any) {
+        function default_each_method(el: HTMLElement, context: any, loop_method: loopFunction, RC: IBlockeXt) {
+            el.childNodes.forEach((item, i) => loop_method.call(RC, i, item, context));
+        }
         this.main_elements.forEach((el) => this.top_loop(el, data, default_each_method));
     }
     top_loop(el: HTMLElement, context: any, each_method: eachFunction) {
@@ -65,6 +66,4 @@ class BlockeXt implements IBlockeXt {
         return each_tag ? each_tag.use() : { break_loop: false, context: context };
     }
 }
-
-export default BlockeXt;
-export { BlockeXt, registry, tagFactory };
+globalThis.BlockExt = BlockeXt;

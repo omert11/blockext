@@ -1,3 +1,4 @@
+import { TagType } from "./enums";
 import { factoryFunction, tagFactory } from "./factory";
 
 const tag_registry: Array<factoryFunction> = [];
@@ -49,4 +50,4 @@ registry.add(
     })
 );
 
-export default registry;
+export { registry };

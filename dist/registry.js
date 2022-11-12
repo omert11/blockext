@@ -1,3 +1,4 @@
+import { TagType } from "./enums";
 import { tagFactory } from "./factory";
 const tag_registry = [];
 const registry = {
@@ -44,5 +45,5 @@ registry.add(tagFactory({
     },
     clean() { },
 }));
-export default registry;
+export { registry };
 //# sourceMappingURL=registry.js.map

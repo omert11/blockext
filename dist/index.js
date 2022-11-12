@@ -1,8 +1,5 @@
-import { tagFactory } from "./factory";
-import registry from "./registry";
-function default_each_method(el, context, loop_method, RC) {
-    el.childNodes.forEach((item, i) => loop_method.call(RC, i, item, context));
-}
+import { TagType } from "./enums";
+import { registry } from "./registry";
 class BlockeXt {
     constructor(selectorOrElement) {
         let el = null;
@@ -30,7 +27,7 @@ class BlockeXt {
     }
     get_filtered_TAGS(type) {
         if (!this[`__${type}_tag_cache`])
-            this[`__${type}_tag_cache`] = this.tags.filter((i) => i.type == type);
+            this[`__${type}_tag_cache`] = this.tags.filter((i) => i._type == type);
         return this[`__${type}_tag_cache`];
     }
     *get_TAG_iter(el, context, tags) {
@@ -49,6 +46,9 @@ class BlockeXt {
         return this.get_TAG_iter(el, context, this.each_tags);
     }
     main_loop(data) {
+        function default_each_method(el, context, loop_method, RC) {
+            el.childNodes.forEach((item, i) => loop_method.call(RC, i, item, context));
+        }
         this.main_elements.forEach((el) => this.top_loop(el, data, default_each_method));
     }
     top_loop(el, context, each_method) {
@@ -63,6 +63,5 @@ class BlockeXt {
         return each_tag ? each_tag.use() : { break_loop: false, context: context };
     }
 }
-export default BlockeXt;
-export { BlockeXt, registry, tagFactory };
+globalThis.BlockExt = BlockeXt;
 //# sourceMappingURL=index.js.map

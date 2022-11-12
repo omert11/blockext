@@ -4,4 +4,5 @@ var TagType;
     TagType["block"] = "block";
     TagType["helper"] = "helper";
 })(TagType || (TagType = {}));
+export { TagType };
 //# sourceMappingURL=enums.js.map

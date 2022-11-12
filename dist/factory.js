@@ -43,8 +43,8 @@ function tagFactory(config) {
         };
         return TAG;
     };
-    func.name = config.name;
-    func.type = config.type;
+    func._name = config.name;
+    func._type = config.type;
     return func;
 }
 export { tagFactory };

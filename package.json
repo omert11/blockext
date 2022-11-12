@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "test": "dev",
-    "build": "tsc --build&webpack --mode=production",
+    "build": "tsc --build & webpack --mode=production",
     "clean": "tsc --build --clean"
   },
   "repository": {

@@ -1,3 +1,5 @@
+import { TagType } from "./enums";
+
 interface TagResponse{
     break_loop: Boolean;
     context: any;
@@ -23,8 +25,8 @@ interface Tag extends TagArgs, TagConfig {
 }
 interface factoryFunction {
     (x: TagArgs): Tag;
-    name: string;
-    type: TagType;
+    _name: string;
+    _type: TagType;
 }
 
 interface IBlockeXt {

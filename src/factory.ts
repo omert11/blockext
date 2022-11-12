@@ -1,4 +1,4 @@
-import { Tag, TagArgs, TagConfig, factoryFunction } from "./interfaces";
+import { factoryFunction, TagArgs, TagConfig } from "./interfaces";
 
 const bx_tag_id = (() => {
     let tag_id = 0;
@@ -45,8 +45,8 @@ function tagFactory(config: TagConfig): factoryFunction {
 
         return TAG;
     };
-    func.name = config.name;
-    func.type = config.type;
+    func._name = config.name;
+    func._type = config.type;
     return func;
 }
 
