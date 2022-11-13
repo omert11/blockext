@@ -1,5 +1,11 @@
 import { TagType } from "./enums";
 import { registry } from "./registry";
+function default_each_method(el, context, loop_method, RC) {
+    for (let i = 0; i < el.children.length; i++) {
+        const item = el.children[i];
+        loop_method.call(RC, i, item, context);
+    }
+}
 class BlockeXt {
     constructor(selectorOrElement) {
         let el = null;
@@ -19,8 +25,8 @@ class BlockeXt {
         let match_result = Array.from(el.outerHTML.matchAll(regexp));
         let used_tags = [];
         match_result.forEach((r) => {
-            if (!used_tags.includes(r[0]))
-                used_tags.push(r[0]);
+            if (!used_tags.includes(r[1]))
+                used_tags.push(r[1]);
         });
         this.used_tags = used_tags;
         this.tags = registry.get_tag_methods(this.used_tags);
@@ -32,7 +38,7 @@ class BlockeXt {
     }
     *get_TAG_iter(el, context, tags) {
         for (const tag of tags) {
-            let attribute = el.getAttribute(`bx-${tag.name}`);
+            let attribute = el.getAttribute(`bx-${tag._name}`);
             if (attribute) {
                 const tag_instance = tag({ el, context });
                 yield tag_instance;
@@ -46,9 +52,6 @@ class BlockeXt {
         return this.get_TAG_iter(el, context, this.each_tags);
     }
     main_loop(data) {
-        function default_each_method(el, context, loop_method, RC) {
-            el.childNodes.forEach((item, i) => loop_method.call(RC, i, item, context));
-        }
         this.main_elements.forEach((el) => this.top_loop(el, data, default_each_method));
     }
     top_loop(el, context, each_method) {
@@ -56,7 +59,7 @@ class BlockeXt {
     }
     loop(i, item, context) {
         let each_response = this.do_each(item, context);
-        this.top_loop(item, context, each_response.each_method);
+        this.top_loop(item, context, each_response.each_method || default_each_method);
     }
     do_each(el, context) {
         let each_tag = this.get_each_tags(el, context).next().value;

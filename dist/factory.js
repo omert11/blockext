@@ -21,7 +21,7 @@ function tagFactory(config) {
                 return context;
             },
             remove_tag_attribute() {
-                return TAG.el.removeAttribute(TAG.attr);
+                return TAG.el.removeAttribute(`bx-${TAG.name}`);
             },
             use() {
                 return {

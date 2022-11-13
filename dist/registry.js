@@ -1,5 +1,11 @@
 import { TagType } from "./enums";
 import { tagFactory } from "./factory";
+function createElementFromHTML(htmlString) {
+    var div = document.createElement("div");
+    div.innerHTML = htmlString.trim();
+    // Change this to div.childNodes to support multiple top-level nodes.
+    return div.firstChild;
+}
 const tag_registry = [];
 const registry = {
     get registry() {
@@ -9,7 +15,7 @@ const registry = {
         tag_registry.push(tag);
     },
     get_tag_methods(arr) {
-        return registry.registry.filter((fF) => arr.includes(fF.name));
+        return registry.registry.filter((fF) => arr.includes(fF._name));
     },
 };
 registry.add(tagFactory({
@@ -20,8 +26,8 @@ registry.add(tagFactory({
         let loop_data = this.data;
         if (!Array.isArray(loop_data))
             loop_data = [loop_data];
-        this.remove_tag();
-        const loop_holder = this.el.setAttribute("bx-each-id", this.tag_id);
+        this.remove_tag_attribute();
+        this.el.setAttribute("bx-each-id", this.id);
         const loop_html = this.el.outerHTML;
         this.loop_html = loop_html;
         return {
@@ -36,10 +42,11 @@ registry.add(tagFactory({
                         "bx-for-first": i == 0,
                         "bx-for-last": i == loop_data.length - 1,
                     };
-                    let $item = loop_html.insertAfter(loop_holder);
-                    loop_method.call(BX, i, $item, each_context);
+                    let item = createElementFromHTML(loop_html);
+                    el.after(item);
+                    loop_method.call(BX, i, item, each_context);
                 }
-                loop_holder.remove();
+                el.remove();
             },
         };
     },
