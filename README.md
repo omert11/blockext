@@ -1,25 +1,3 @@
-<style>
-    h1{
-		font-size:45px;
-		color:#a2d2ff;
-    }
-    h2{
-		font-size:25px;
-		color:#cdb4db;
-    }
-    h3{
-		font-size:16px;
-		color:#bde0fe;
-    }
-	.tag::before{
-		content:"["attr(tag-type)"] ";
-		font-size:12px;
-		color:#ffafcc;
-        font-weight:900;
-	}
-    
-</style>
-
 # Blockext
 
 Frontend Based Template Engine!
@@ -49,15 +27,7 @@ Easily render your template via attributes without using a different structure.
 
 Installation;
 
-`npm install --save blockext`
-
-or
-
-`www.cdn.com`
-
-or
-
-`Download raw zip file use files from dist`
+`npm i blockext`
 
 ## Get started
 

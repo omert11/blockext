@@ -2,7 +2,6 @@
   "name": "blockext",
   "version": "1.0.0",
   "description": "Faster Template Engine",
-  "private": true,
   "scripts": {
     "dev": "webpack --watch  --mode=development",
     "build": "tsc --build & webpack --mode=production",
