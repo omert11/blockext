@@ -64,14 +64,15 @@ const IF_IS_TAG = tagFactory({
             attr: string;
             condition: boolean;
         }
-        const nodeInstance = {
+        const nodeContext = {
             ...this.context,
             __nd(el: HTMLElement, tag: string, condition = false): NodeData {
                 let attr = el.getAttribute(tag);
-                if (!condition)
+                if (tag != "bx-else")
                     try {
                         condition = eval(attr);
                     } catch (e) {}
+                else condition = true;
                 return {
                     el,
                     tag,
@@ -80,20 +81,21 @@ const IF_IS_TAG = tagFactory({
                 };
             },
         };
-
-        let nodes = [nodeInstance.__nd(this.el, "bx-if-is")];
-        let lastNode = this.el;
-        while (lastNode.nextElementSibling && ["bx-elif-is", "bx-else"].some((t) => lastNode.nextElementSibling.hasAttribute(t))) {
-            lastNode = lastNode.nextElementSibling as HTMLElement;
-            if (lastNode.hasAttribute("bx-else")) {
-                nodes.push(nodeInstance.__nd(lastNode, "bx-else", true));
-                break;
+        const nodeEach = (el: HTMLElement, nodeFound = false, deleteEL = true) => {
+            let tag = ["bx-if-is", "bx-elif-is", "bx-else"].find((i) => el.hasAttribute(i));
+            if (!nodeFound) {
+                let data: NodeData = nodeContext.__nd(el, tag);
+                if (data.condition) {
+                    nodeFound = true;
+                    deleteEL = false;
+                    el.removeAttribute(tag);
+                }
             }
-            nodes.push(nodeInstance.__nd(lastNode, "bx-elif-is"));
-        }
-        let active_node = nodes.find((i) => i.condition);
-        nodes.filter((i) => i.el != active_node.el).forEach((e) => e.el.remove());
-        active_node.el.removeAttribute(active_node.tag);
+            if (el.nextElementSibling && ["bx-elif-is", "bx-else"].some((t) => el.nextElementSibling.hasAttribute(t))) nodeEach(el.nextElementSibling as HTMLElement, nodeFound, true);
+
+            if (deleteEL) el.remove();
+        };
+        nodeEach(this.el);
         return {
             break_loop: true,
         };
