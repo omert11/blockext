@@ -58,27 +58,44 @@ const IF_IS_TAG = tagFactory({
     name: "if-is",
     type: TagType.each,
     use() {
-        let nodes = [{ el: this.el, tag: "bx-if-is", data: this.data }];
+        interface NodeData {
+            el: HTMLElement;
+            tag: string;
+            attr: string;
+            condition: boolean;
+        }
+        const nodeInstance = {
+            ...this.context,
+            __nd(el: HTMLElement, tag: string, condition = false): NodeData {
+                let attr = el.getAttribute(tag);
+                if (!condition)
+                    try {
+                        condition = eval(attr);
+                    } catch (e) {}
+                return {
+                    el,
+                    tag,
+                    attr,
+                    condition,
+                };
+            },
+        };
+
+        let nodes = [nodeInstance.__nd(this.el, "bx-if-is")];
         let lastNode = this.el;
         while (lastNode.nextElementSibling && ["bx-elif-is", "bx-else"].some((t) => lastNode.nextElementSibling.hasAttribute(t))) {
             lastNode = lastNode.nextElementSibling as HTMLElement;
             if (lastNode.hasAttribute("bx-else")) {
-                nodes.push({ el: lastNode, tag: "bx-else", data: true });
+                nodes.push(nodeInstance.__nd(lastNode, "bx-else", true));
                 break;
             }
-            let data = false;
-            try {
-                data = Boolean(this.get_data(lastNode.getAttribute("bx-elif-is"), this.context));
-            } catch (e) {}
-            nodes.push({ el: lastNode, tag: "bx-elif-is", data: data });
+            nodes.push(nodeInstance.__nd(lastNode, "bx-elif-is"));
         }
-        let active_node = nodes.find((i) => i.data);
+        let active_node = nodes.find((i) => i.condition);
         nodes.filter((i) => i.el != active_node.el).forEach((e) => e.el.remove());
         active_node.el.removeAttribute(active_node.tag);
         return {
             break_loop: true,
-            context: null,
-            each_method(el: HTMLElement, context: any, loop_method: loopFunction, BX: IBlockeXt) {},
         };
     },
 });
