@@ -43,9 +43,6 @@ function tagFactory(config: TagConfig): factoryFunction {
                     ...(config.use.call(TAG) || {}),
                 };
             },
-            clean() {
-                if (config.clean) return config.clean.call(TAG);
-            },
             get attr() {
                 return TAG.get_html_attribute(TAG.el);
             },

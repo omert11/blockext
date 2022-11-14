@@ -9,7 +9,6 @@ interface TagConfig {
     name: string;
     type: TagType;
     use(this: Tag): void;
-    clean?: (this: Tag) => any;
 }
 interface TagArgs {
     el: HTMLElement;

@@ -1,5 +1,5 @@
 import { TagType } from "./enums";
-import { factoryFunction } from "./factory";
+import { factoryFunction, tagFactory } from "./factory";
 import { eachFunction, IBlockeXt, loopFunction, Tag } from "./interfaces";
 import { registry } from "./registry";
 
@@ -12,11 +12,14 @@ function default_each_method(el: HTMLElement, context: any, loop_method: loopFun
 }
 class BlockeXt implements IBlockeXt {
     el: HTMLElement;
+    raw_html: string;
     main_elements: NodeListOf<HTMLElement>;
     templates: Object;
     tag_instances: Tag[];
     used_tags: string[];
     tags: factoryFunction[];
+    static registry = registry;
+    static tagFactory = tagFactory;
     constructor(selectorOrElement: keyof HTMLElementTagNameMap | HTMLElement | string) {
         let el = null;
         if (typeof selectorOrElement == "string") {
@@ -25,6 +28,7 @@ class BlockeXt implements IBlockeXt {
         } else el = selectorOrElement;
         this.el = el;
         this.main_elements = this.el.querySelectorAll("[bx-main]");
+        this.raw_html = this.el.innerHTML;
         this.tag_instances = [];
         this.templates = {};
         this.collect_tags(this.el);
@@ -134,7 +138,7 @@ class BlockeXt implements IBlockeXt {
         this.main_loop(data);
     }
     clean() {
-        this.tag_instances.reverse().forEach((t) => t.clean());
+        this.el.innerHTML = this.raw_html;
         this.tag_instances = [];
     }
 }
