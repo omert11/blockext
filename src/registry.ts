@@ -25,14 +25,12 @@ const FOR_TAG = tagFactory({
     name: "for",
     type: TagType.each,
     use() {
-        this.add_context("base_attr", this.attr);
         let loop_data = this.data;
         if (!loop_data) loop_data = [];
         else if (!Array.isArray(loop_data)) loop_data = [loop_data];
         this.remove_tag_attribute();
         this.el.setAttribute("bx-each-id", this.id.toString());
         const loop_html = this.el.outerHTML;
-        this.add_context("loop_html", loop_html);
         return {
             break_loop: false,
             context: null,
@@ -112,7 +110,6 @@ const BREAK_IS_TAG = tagFactory({
         } catch (e) {
             res.break_loop = true;
         }
-        this.add_context("base_attr", this.attr);
         this.remove_tag_attribute();
         return res;
     },
@@ -151,11 +148,24 @@ const SET_ATTR_TAG = tagFactory({
     name: "set-attr",
     type: TagType.helper,
     use() {
-        //'{prop_path}>[{attr_name}]'
-        let regexp_group = /(.*?)>\[(.*?)\]/g.exec(this.attr);
-        let context = this.get_data(regexp_group[1], this.context);
-        this.add_context("target_attr", regexp_group[2]);
-        this.el.setAttribute(this.get_context("target_attr"), context);
+        /**
+         * '{prop_path}>{attr_name}'
+         * or
+         * '{prop_paths}>{attr_name}]>template'
+         * sample -> 'foo,bar,baz>[name]>$$[$$][$$]'
+         */
+        let sections = this.attr.split(">");
+        let template = sections.length == 2 ? "$$" : sections[2];
+
+        let prop_paths = sections[0].split(",");
+        let props = prop_paths.map((p) => this.get_data(p, this.context));
+
+        template = props.reduce((p, c) => p.replace("$$", c), template);
+
+        this.el.setAttribute(sections[1], template);
+        
+        this.remove_tag_attribute();
+        
     },
 });
 registry.add(SET_ATTR_TAG);

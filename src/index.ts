@@ -6,8 +6,7 @@ import { registry } from "./registry";
 function default_each_method(el: HTMLElement, context: any, loop_method: loopFunction, BX: IBlockeXt) {
     const length = el.children.length;
     for (let i = 0; i < length; i++) {
-        const item = el.children[i];
-        loop_method.call(BX, i, item, context);
+        if (el.children?.[i]) loop_method.call(BX, i, el.children[i], context);
     }
 }
 class BlockeXt implements IBlockeXt {
@@ -139,6 +138,7 @@ class BlockeXt implements IBlockeXt {
     }
     clean() {
         this.el.innerHTML = this.raw_html;
+        this.main_elements = this.el.querySelectorAll("[bx-main]");
         this.tag_instances = [];
     }
 }
