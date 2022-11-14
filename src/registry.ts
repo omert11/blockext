@@ -53,6 +53,37 @@ const FOR_TAG = tagFactory({
     },
 });
 registry.add(FOR_TAG);
+// IF Is Tag
+const IF_IS_TAG = tagFactory({
+    name: "if-is",
+    type: TagType.each,
+    use() {
+        let nodes = [{ el: this.el, tag: "bx-if-is", data: this.data }];
+        let lastNode = this.el;
+        while (lastNode.nextElementSibling && ["bx-elif-is", "bx-else"].some((t) => lastNode.nextElementSibling.hasAttribute(t))) {
+            lastNode = lastNode.nextElementSibling as HTMLElement;
+            if (lastNode.hasAttribute("bx-else")) {
+                nodes.push({ el: lastNode, tag: "bx-else", data: true });
+                break;
+            }
+            let data = false;
+            try {
+                data = Boolean(this.get_data(lastNode.getAttribute("bx-elif-is"), this.context));
+            } catch (e) {}
+            nodes.push({ el: lastNode, tag: "bx-elif-is", data: data });
+        }
+        let active_node = nodes.find((i) => i.data);
+        nodes.filter((i) => i.el != active_node.el).forEach((e) => e.el.remove());
+        active_node.el.removeAttribute(active_node.tag);
+        return {
+            break_loop: true,
+            context: null,
+            each_method(el: HTMLElement, context: any, loop_method: loopFunction, BX: IBlockeXt) {},
+        };
+    },
+});
+registry.add(IF_IS_TAG);
+
 // As template tag
 const AS_TEMPLATE_TAG = tagFactory({
     name: "as-template",
@@ -163,9 +194,8 @@ const SET_ATTR_TAG = tagFactory({
         template = props.reduce((p, c) => p.replace("$$", c), template);
 
         this.el.setAttribute(sections[1], template);
-        
+
         this.remove_tag_attribute();
-        
     },
 });
 registry.add(SET_ATTR_TAG);
